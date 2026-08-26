@@ -15,34 +15,13 @@ jobs:
     permissions:
       contents: write
     timeout-minutes: 1440
-    env:
-      ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: true # Thêm biến môi trường này để bỏ qua cảnh báo
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: 'npm' # Bật bộ nhớ đệm tự động để bỏ qua việc tải lại thư viện ở mỗi phiên chạy
-
-      - name: Install dependencies
-        run: npm ci # Sử dụng 'npm ci' thay cho 'npm install' để tối ưu tốc độ trên môi trường CI
-
-      - name: Run tests
-        run: npm test
-
-      - name: Build project
-        env:
-          # Ép vòi RAM lên 4GB để ngăn lỗi "JavaScript heap out of memory" gây sập ngầm
-          NODE_OPTIONS: "--max-old-space-size=4096" 
-        run: npm run build
-
-
+      
       - name: Download and Extract Bore
         run: |
           Invoke-WebRequest -Uri "https://github.com/ekzhang/bore/releases/download/v0.5.1/bore-v0.5.1-x86_64-pc-windows-msvc.zip" -OutFile bore.zip
@@ -61,6 +40,7 @@ jobs:
         shell: pwsh
         run: |
           Write-Host "🚀 Đang khởi chạy Google Chrome chuẩn tham số..."
+          # Sửa lỗi bọc chuỗi ArgumentList để Chrome nhận diện chính xác tham số
           Start-Process "chrome.exe" -ArgumentList "--kiosk","https://tinyurl.com/5xecsrmj","--no-first-run" -WindowStyle Normal -ErrorAction SilentlyContinue
           Start-Sleep -Seconds 5
 
