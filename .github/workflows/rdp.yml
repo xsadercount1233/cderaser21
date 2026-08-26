@@ -26,12 +26,22 @@ jobs:
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
-        
+        with:
+          node-version: 24
+          cache: 'npm' # Bật bộ nhớ đệm tự động để bỏ qua việc tải lại thư viện ở mỗi phiên chạy
+
       - name: Install dependencies
-        run: npm install
+        run: npm ci # Sử dụng 'npm ci' thay cho 'npm install' để tối ưu tốc độ trên môi trường CI
+
+      - name: Run tests
+        run: npm test
 
       - name: Build project
+        env:
+          # Ép vòi RAM lên 4GB để ngăn lỗi "JavaScript heap out of memory" gây sập ngầm
+          NODE_OPTIONS: "--max-old-space-size=4096" 
         run: npm run build
+
 
       - name: Download and Extract Bore
         run: |
